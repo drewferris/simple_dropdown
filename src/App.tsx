@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react'; // let's also import Component
 import './App.css';
+import AppContext from './app_context';
+import SelectDropdown from './SelectDropdown';
+import List from './List';
+type AppState = {
+  selectValues: string[];
+  selectedValues: string[];
+  selectedVal: string;
+};
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+export default class App extends Component<{}, AppState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      selectValues: ['choose', 'option1', 'option2', 'option3', 'option4'],
+      selectedValues: [],
+      selectedVal: ''
+    };
+  }
+  selectVal = (val: string): void => {
+    this.setState({ selectedVal: val });
+  };
+  addVal = () => {
+    this.setState(prevState => ({
+      selectedValues: [...prevState.selectedValues, this.state.selectedVal],
+      selectedVal: ''
+    }));
+  };
+  deleteVal = (valToDelete: string) => {
+    let temp = this.state.selectedValues;
+    temp.splice(temp.indexOf(valToDelete), 1);
+    this.setState({ selectedValues: temp });
+  };
+  render() {
+    return (
+      <div className='App'>
+        <AppContext.Provider
+          value={{
+            selectValues: this.state.selectValues,
+            selectedValues: this.state.selectedValues
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+          <SelectDropdown
+            selectVal={this.selectVal}
+            addVal={this.addVal}
+          ></SelectDropdown>
+          <List deleteVal={this.deleteVal}></List>
+        </AppContext.Provider>
+      </div>
+    );
+  }
 }
-
-export default App;
